@@ -37,6 +37,9 @@ Use `git diff _branch_...HEAD` and `git log _branch_...HEAD` to gather the chang
 the _branch_ branch.
 
 Do this in the current directory (the one this agent was invokd in).
+THIS IS VERY IMPORTANT, determine this current directory carefully and log it so I the user can
+see it and stop you in case it is wrong.
+Run all the following steps from this directory.
 
 ## 3. PR Body
 
