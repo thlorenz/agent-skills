@@ -1,5 +1,5 @@
 ---
-name: removing-features
+name: feat-remove
 description: Plans and implements feature removal step-by-step with build/test verification. Use for refactoring code to remove deprecated or unwanted features.
 ---
 
