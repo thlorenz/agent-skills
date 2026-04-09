@@ -21,14 +21,15 @@ branch. Thus you can use `git diff` and `git log` in order to see which changes 
 Ask me for issues that this PR closes, I will provide them via comma separated numbers, or
 `none` if there is none.
 
-You will add these issues as part of the PR summary section via the _CLOSES_ keyword.
+You will add these issues as part of the PR summary section via the _CLOSES_ keyword. One for each.
 Example:
 
 ```markdown
 ## Summary
 
 <summary of the PR>
-CLOSES: #123, #456
+CLOSES: #123
+CLOSES: #456
 ```
 
 ## 2. Gather Changes
