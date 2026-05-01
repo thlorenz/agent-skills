@@ -52,3 +52,20 @@ If no option is specified, use `fix-lint` (fixes lint errors but not tests).
 - Lint and test failures are logged but don't halt the skill
 - Use `fix-tests` carefully as automatic fixes may not resolve root causes
 - For package-specific testing, manually invoke: `cargo nextest run -p <package-name>`
+
+## Non Rust
+
+The checks above are tailored to Rust projects. For other projects substitute the commands with
+appropriate equivalents.
+
+You should determine this once before writing the plan and then use the same substitues
+throughout the plan.
+
+### TypeScript/NextJS/JavaScript
+
+Look for yarn commands in package.json first and use them if found, otherwise fall back to
+standard commands:
+
+1. **Format**:: `yarn fmt` or `yarn format` or `prettier --write .`
+2. **Lint**: `yarn lint` or `eslint . --fix`
+3. **Test**: `yarn test` or do nothing if not defined

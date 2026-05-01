@@ -16,6 +16,13 @@ branch. Thus you can use `git diff` and `git log` in order to see which changes 
 
 ## Workflow (checklist)
 
+Remote selection rule:
+
+- default to creating the PR on `origin`
+- NEVER create the PR on `upstream` unless the user explicitly asks for that
+- if both `origin` and `upstream` exist, treat `origin` as the default PR target repo and use `upstream` only as a read-only comparison target unless instructed otherwise
+
+
 ### 1. Closed Issues
 
 Ask me for issues that this PR closes, I will provide them via comma separated numbers, or

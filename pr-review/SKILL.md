@@ -15,6 +15,19 @@ The user provides:
 - A PR number or URL (required)
 - Optionally: focus areas, event type preference, or specific concerns
 
+## Output
+
+When the skill completes, behavior depends on whether output is piped:
+
+**If piped (e.g., `pr-review <url> | pr-post`):**
+- Do NOT post the review to GitHub
+- Output only the PR number or URL so downstream skills can pick it up
+- Skip section 4 (Post the Review) entirely
+
+**If run standalone:**
+- Post the review to GitHub as usual (section 4)
+- Tell the user the review has been posted
+
 ## Prerequisites
 
 Before starting, verify the gh CLI is available:
@@ -45,7 +58,9 @@ gh pr view <PR_NUMBER> --json headRefName --jq '.headRefName'
 ```
 
 - Compare the current branch with the PR's head branch.
-- If they do NOT match, tell the user: "Please check out the PR branch and respond with OK."
+- If they do NOT match do one of the below:
+  - check if the staging area is clean (untracked files are ok) and if so, check out the correct branch and continue
+  - if the staging area is dirty tell the user: "Please check out the PR branch and respond with OK."
 - Do NOT proceed until the branches match.
 
 ### 2. Analyze the PR and Prepare a Review Plan
@@ -119,6 +134,10 @@ use it when submitting your review on GitHub>
 **Side:** RIGHT
 **Link:** [path/to/file.ts#L20](https://github.com/<owner>/<repo>/pull/<PR_NUMBER>/files#diff-<sha256_of_path>R20)
 
+```
+<relevant code snippet for context with line numbers prepended>
+```
+
 **Comment:**
 <comment text>
 
@@ -135,6 +154,10 @@ use it when submitting your review on GitHub>
 **Side:** RIGHT
 **Link:** [path/to/other-file.ts#L35-L40](https://github.com/<owner>/<repo>/pull/<PR_NUMBER>/files#diff-<sha256_of_path>R35-R40)
 
+```
+<relevant code snippet for context with line numbers prepended>
+```
+
 **Comment:**
 <comment text>
 
@@ -148,7 +171,24 @@ use it when submitting your review on GitHub>
 - Wait for the user to respond with OK.
 - Do NOT proceed until the user explicitly responds.
 
-### 4. Post the Review
+### 4. Post the Review (Conditional)
+
+**Check if output is piped:**
+
+```bash
+[ -t 1 ]
+```
+
+If `[ -t 1 ]` returns true (not piped):
+- Proceed with posting the review to GitHub (steps below)
+- Tell the user the code comments have been posted
+
+If `[ -t 1 ]` returns false (piped to another command):
+- **Skip all GitHub posting steps**
+- Output the PR number (or URL) on its own line
+- Stop here; let the piped command (e.g., `pr-post`) handle the plan file
+
+**If posting (not piped):**
 
 - Read `/tmp/pr-<PR_NUMBER>-review-plan.md` to get the remaining comments after the user's edits.
 - Parse the plan file to extract all remaining comments and the event type.
