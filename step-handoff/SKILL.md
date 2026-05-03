@@ -35,8 +35,11 @@ This skill defines what goes into those steps and how subagents chain to one ano
 Decide the handoff mechanism **before writing the plan** and hardcode it into the plan
 instructions:
 
-- If `/handoff` is available in the agent (e.g. amp), instruct the agent to hand off to a
-  subagent to execute each step.
+- If the agent is **Pi** and `pi-subagents` is available, the **parent Pi session** must use
+  `subagent(...)` to launch **one child per step** in the foreground. Use a fresh child thread
+  for each step. **Do not instruct child subagents to launch more subagents.**
+- Otherwise, if `/handoff` is available in the agent (e.g. amp), instruct the agent to hand off
+  to a subagent to execute each step.
 - Otherwise (e.g. codex), instruct the user to run `/clear` after each step to start a new
   thread, then continue with the next step.
 
@@ -68,7 +71,9 @@ If a step requires no code change (e.g. a finding that no longer applies after v
 - Write a short explanation of why the step was skipped to
   `/tmp/<skill-name>-skip-<step-number>.md`.
 
-## Recursive Handoff
+## Recursive Handoff / Pi Parent-Orchestrated Delegation
+
+### Non-Pi agents
 
 When handing off, the handoff prompt MUST clearly instruct the receiving subagent that, after
 completing its assigned step and all post-step instructions, it must:
@@ -85,6 +90,30 @@ The handoff prompt MUST very clearly indicate:
 - The agent must **NOT** execute any step other than the one it was assigned.
 - When handing off, the agent must **switch to the new thread** so the user can see its
   progress (do not run it in the background).
+
+### Pi with `pi-subagents`
+
+Pi must implement the same protocol from the **parent session**, not by asking child subagents to
+spawn more children.
+
+For Pi, the parent session MUST:
+
+1. Launch exactly one child subagent for the current step via `subagent(...)`.
+2. Instruct that child to execute **only** its assigned step plus the mandatory post-step block.
+3. Require the child to mark the step as completed (✓) in the plan file before finishing.
+4. Wait for the child to finish in the foreground.
+5. Then launch a **new** child subagent for the next remaining step.
+6. Repeat until all steps are completed.
+
+Pi-specific constraints:
+
+- **THE PARENT SESSION MUST STAY IN CONTROL OF ORCHESTRATION.**
+- **CHILD SUBAGENTS MUST NOT BE TOLD TO LAUNCH OR PROPOSE MORE SUBAGENTS.**
+- **ONE CHILD == ONE STEP == ONE THREAD.**
+- When launching a child via `subagent(...)`, explicitly use the **same model as the parent thread/session** unless the user requested otherwise.
+- **DO NOT silently upgrade to a "better" or more expensive model for child subagents.**
+- Use a fresh child thread for each step so the context window stays small.
+- Do not run step execution in the background.
 
 ## Plan Conventions
 
@@ -106,6 +135,9 @@ commit) after each sub-step.
 ## Commits
 
 NEVER commit prompt or plan files (anything inside `./prompts/**`).
+
+BUT DO UPDATE the plan file inside ./prompts/** to mark the step as completed (✓) after the
+step is done and before handing off to the next subagent. THAT IS VERY IMPORTANT.
 
 If a file inside `./prompts/**` was staged, **immediately stop and unstage it** before doing
 anything else.

@@ -18,6 +18,8 @@ Runs three sequential checks on Rust code:
 
 When this skill loads, immediately run format, lint, and test with default mode (fix-lint). Do not ask the user for input.
 
+Assume all required local tooling is already installed and available, including `cargo`, `cargo fmt`, `cargo clippy`, `cargo nextest`, and any other standard tools referenced by this skill. Do not spend time checking whether tools are installed, and do not hedge or hesitate about tool availability.
+
 ### Options (optional, user may specify)
 
 - **fix-lint**: Fix cargo clippy errors automatically (default mode)
@@ -49,6 +51,7 @@ If no option is specified, use `fix-lint` (fixes lint errors but not tests).
 ## Notes
 
 - Format always runs first regardless of options
+- Treat all commands in this skill as ready to run locally without any installation or availability checks
 - Lint and test failures are logged but don't halt the skill
 - Use `fix-tests` carefully as automatic fixes may not resolve root causes
 - For package-specific testing, manually invoke: `cargo nextest run -p <package-name>`

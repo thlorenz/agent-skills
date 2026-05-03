@@ -72,7 +72,13 @@ NEVER COMMIT prompt/plan files, i.e. anything inside a ./prompts directory.
 Only include a commit message aside from the title when it is a very large change, otherwise
 leave it empty.
 
-NEVER LIST A co-author or agent thread id, i.e. the below should NEVER BE INCLUDED:
+NEVER LIST co-author or agent thread id, i.e. the below should NEVER BE INCLUDED:
 
 Amp-Thread-ID: https://ampcode.com/threads/T-019dce36-f47e-762c-b869-c102743093b0
 Co-authored-by: Amp <amp@ampcode.com>
+
+THIS IS VERY IMPORTANT.
+STOP IF THE COMMIT MESSAGE INCLUDES EITHER OF THE ABOVE OR SIMILAR, i.e.:
+
+Amp-Thread-ID: ...
+Co-authored-by: ...
